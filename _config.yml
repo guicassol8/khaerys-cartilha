@@ -1,0 +1,21 @@
+title: Cartilha do Portador Licenciado
+description: >-
+  Guilda dos Aventureiros de Ossara — 4ª revisão, 96 D.C.
+  Distribuição obrigatória a todo licenciado.
+lang: pt-BR
+
+# Sem tema: o layout e a folha de estilo são deste repositório e não
+# dependem de gem nenhuma. A Action injeta `layout: default` no
+# frontmatter de cada cópia; o default abaixo é o cinto de segurança.
+defaults:
+  - scope:
+      path: ""
+    values:
+      layout: "default"
+
+# jekyll-relative-links vem ligado por padrão no GitHub Pages e converte
+# os links .md entre os documentos nas URLs geradas. É por isso que a
+# navegação do índice funciona sem nenhuma reescrita.
+
+exclude:
+  - _config.yml

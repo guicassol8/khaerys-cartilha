@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="pt-BR" data-fase="sol">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% if page.numero %}{{ page.numero }} · {{ page.rotulo }} — {{ site.title }}{% else %}{{ site.title }}{% endif %}</title>
+<meta name="description" content="{{ site.description | strip_newlines | strip }}">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='29' fill='none' stroke='%23b96a24' stroke-width='3.5'/%3E%3Cpath d='M44.14 45.67A18.5 18.5 0 1 1 19.86 18.33A18.5 18.5 0 0 0 44.14 45.67Z' fill='%23b96a24'/%3E%3Ccircle cx='34.1' cy='30.14' r='18.5' fill='none' stroke='%23b96a24' stroke-width='2.5'/%3E%3Ccircle cx='40.6' cy='24.6' r='2.8' fill='%23b96a24'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="assets/cartilha.css">
+<script>
+/* Fase do céu. Roda antes da primeira pintura para a página nunca piscar.
+   Sem script, o documento fica na fase do sol e o seletor não aparece. */
+(function () {
+  var raiz = document.documentElement;
+  raiz.className += ' js';
+  var CHAVE = 'cartilha:fase';
+
+  /* 12h de domínio solar, 12h de domínio lunar, 6 minutos de virada em cada
+     ponta: 05:57–06:03 e 17:57–18:03. */
+  function doCeu(agora) {
+    var m = agora.getHours() * 60 + agora.getMinutes();
+    if ((m >= 357 && m < 363) || (m >= 1077 && m < 1083)) return 'fio';
+    return (m >= 363 && m < 1077) ? 'sol' : 'lua';
+  }
+
+  function escolhida() {
+    try {
+      var v = localStorage.getItem(CHAVE);
+      return (v === 'sol' || v === 'lua') ? v : 'ceu';
+    } catch (e) { return 'ceu'; }
+  }
+
+  function aplicar() {
+    var e = escolhida();
+    raiz.setAttribute('data-fase', e === 'ceu' ? doCeu(new Date()) : e);
+    var botoes = document.querySelectorAll('.seletor button[data-escolha]');
+    for (var i = 0; i < botoes.length; i++) {
+      botoes[i].setAttribute('aria-pressed',
+        botoes[i].getAttribute('data-escolha') === e ? 'true' : 'false');
+    }
+  }
+
+  aplicar();
+
+  document.addEventListener('DOMContentLoaded', function () {
+    aplicar();
+    var seletor = document.querySelector('.seletor');
+    if (!seletor) return;
+    seletor.addEventListener('click', function (ev) {
+      var b = ev.target.closest ? ev.target.closest('button[data-escolha]') : null;
+      if (!b) return;
+      try { localStorage.setItem(CHAVE, b.getAttribute('data-escolha')); } catch (e) {}
+      aplicar();
+    });
+  });
+
+  /* Reavalia sozinho, para a virada acontecer com a página aberta. */
+  setInterval(aplicar, 20000);
+  document.addEventListener('visibilitychange', function () {
+    if (!document.hidden) aplicar();
+  });
+})();
+</script>
+</head>
+<body>
+
+<a class="pular" href="#conteudo">pular para o conteúdo</a>
+
+<header class="timbre">
+  <div class="timbre-marca">
+    <!-- Selo da guilda: dois discos do mesmo tamanho, um cobrindo o outro,
+         com a réstia de luz que escapa embaixo e um ponto escuro
+         descentrado no disco da frente. Herda a cor da fase. -->
+    <svg class="selo" viewBox="0 0 64 64" role="img" aria-label="Selo da Guilda dos Aventureiros de Ossara">
+      <circle cx="32" cy="32" r="30" fill="none" stroke="currentColor" stroke-width="2" opacity=".5"/>
+      <path d="M44.14 45.67A18.5 18.5 0 1 1 19.86 18.33A18.5 18.5 0 0 0 44.14 45.67Z" fill="currentColor" opacity=".95"/>
+      <circle cx="34.1" cy="30.14" r="18.5" fill="none" stroke="currentColor" stroke-width="1.4"/>
+      <circle cx="40.6" cy="24.6" r="2" fill="currentColor" opacity=".65"/>
+    </svg>
+    <div class="timbre-linhas">
+      <p class="timbre-guilda">Guilda dos Aventureiros de Ossara</p>
+      <p class="timbre-titulo"><a href="index.html">Cartilha do Portador Licenciado</a></p>
+      <p class="timbre-meta">4ª revisão · 96 D.C. · distribuição obrigatória</p>
+    </div>
+  </div>
+
+  <p class="carimbo" aria-label="Aprovada pelos Vígeis de Ossara">
+    <span class="carimbo-verbo">Aprovada</span>
+    <span class="carimbo-orgao">Vígeis de Ossara</span>
+  </p>
+
+  <div class="controles">
+    <div class="seletor" role="group" aria-label="Fase">
+      <button type="button" data-escolha="sol" aria-pressed="false">brasa</button>
+      <button type="button" data-escolha="lua" aria-pressed="false">olho</button>
+      <button type="button" data-escolha="ceu" aria-pressed="true">seguir o céu</button>
+    </div>
+    <p class="hora-neutra">hora neutra</p>
+  </div>
+</header>
+
+{% assign docs = site.pages | where_exp: "d", "d.ordem" | sort: "ordem" %}
+{% assign atual = -1 %}
+{% for d in docs %}{% if d.url == page.url %}{% assign atual = forloop.index0 %}{% endif %}{% endfor %}
+{% assign ianterior = atual | minus: 1 %}
+{% assign iseguinte = atual | plus: 1 %}
+
+<div class="folha">
+
+  <nav class="sumario" aria-label="Sumário da cartilha">
+    <p class="sumario-rotulo">Sumário</p>
+    <ol>
+      {% for d in docs %}
+      <li>
+        <a href="{{ d.name | replace: '.md', '.html' }}"{% if d.url == page.url %} aria-current="page"{% endif %}>
+          <span class="sumario-numero">{{ d.numero }}</span>
+          <span class="sumario-titulo">{{ d.rotulo }}</span>
+        </a>
+      </li>
+      {% endfor %}
+    </ol>
+  </nav>
+
+  <main id="conteudo" class="documento">
+    {{ content }}
+
+    {% if atual >= 0 %}
+    <nav class="paginacao" aria-label="Documento anterior e seguinte">
+      {% for d in docs %}{% if forloop.index0 == ianterior %}
+      <a class="paginacao-anterior" rel="prev" href="{{ d.name | replace: '.md', '.html' }}">
+        <span class="paginacao-rotulo">anterior</span>
+        <span class="paginacao-titulo">{{ d.rotulo }}</span>
+      </a>
+      {% endif %}{% endfor %}
+      {% for d in docs %}{% if forloop.index0 == iseguinte %}
+      <a class="paginacao-seguinte" rel="next" href="{{ d.name | replace: '.md', '.html' }}">
+        <span class="paginacao-rotulo">seguinte</span>
+        <span class="paginacao-titulo">{{ d.rotulo }}</span>
+      </a>
+      {% endif %}{% endfor %}
+    </nav>
+    {% endif %}
+  </main>
+
+</div>
+
+<footer class="rodape">
+  <p class="advertencia">Você é licenciado. Isso significa que a lei permite que você carregue pedra, que a use, e que morra por causa dela.</p>
+  <p class="endereco">guicassol8.github.io/khaerys-cartilha</p>
+</footer>
+
+</body>
+</html>

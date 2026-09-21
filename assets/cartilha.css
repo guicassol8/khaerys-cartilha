@@ -1,0 +1,716 @@
+/* ═══════════════════════════════════════════════════════════════════
+   Cartilha do Portador Licenciado — folha de estilo única.
+
+   Sem CDN, sem fonte remota, sem biblioteca: um arquivo, nenhuma
+   requisição a terceiro. A página obedece ao céu — não tem modo claro
+   nem modo escuro, tem fase, e a fase é atributo do <html>.
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* ── As fases ──────────────────────────────────────────────────── */
+
+:root,
+[data-fase="sol"] {
+  color-scheme: light;
+
+  --fundo:        #f4ead6;   /* papel morno                          */
+  --fundo-2:      #ece0c8;   /* caixas, cabeçalho de tabela          */
+  --faixa:        #f0e5cf;   /* linha alternada do livro-razão       */
+  --tinta:        #241c14;
+  --tinta-fraca:  #6b5a45;
+  --regua:        #cdb994;
+  --brasa:        #9e4a17;   /* acento, links, numeração             */
+  --brasa-fraca:  #d99a58;   /* só como fundo e realce, nunca texto  */
+  --carimbo:      #8c2f28;
+
+  --glifo: "●";
+  --grao: .04;
+}
+
+[data-fase="lua"] {
+  color-scheme: dark;
+
+  --fundo:        #0f1319;
+  --fundo-2:      #161c25;
+  --faixa:        #12171f;
+  --tinta:        #d9e0ea;
+  --tinta-fraca:  #8b97a8;
+  --regua:        #2b3543;
+  --brasa:        #93b0d4;
+  --brasa-fraca:  #5f7d9e;
+  --carimbo:      #6f8bb0;
+
+  --glifo: "○";
+  --grao: .022;
+}
+
+[data-fase="fio"] {
+  color-scheme: dark;
+
+  --fundo:        #1a1a1b;
+  --fundo-2:      #212123;
+  --faixa:        #1e1e1f;
+  --tinta:        #c9c7c4;
+  --tinta-fraca:  #8b8984;
+  --regua:        #35343550;
+  --brasa:        #9a9894;   /* sem temperatura, sem lado            */
+  --brasa-fraca:  #6e6c69;
+  --carimbo:      #93918c;
+
+  --glifo: "◐";
+  --grao: .018;
+}
+
+:root {
+  --fonte-corpo: Charter, "Bitstream Charter", "Sitka Text", Cambria,
+                 Georgia, "Liberation Serif", serif;
+  --fonte-titulo: var(--fonte-corpo);
+  --fonte-oficial: ui-monospace, "SFMono-Regular", "Liberation Mono", monospace;
+
+  --medida: 68ch;      /* medida de leitura                          */
+  --pagina: 62rem;     /* largura útil da folha inteira              */
+  --margem: 1.25rem;
+  --sumario: 14.5rem;  /* coluna do sumário                          */
+  --vao: 3rem;         /* entre o sumário e o texto                  */
+}
+
+/* Em tela larga a folha termina exatamente onde o texto termina: nada
+   de filete de cabeçalho sobrando à direita da última linha. */
+@media (min-width: 62rem) {
+  :root {
+    --pagina: calc(var(--sumario) + var(--vao) + var(--medida) + var(--margem) * 2);
+  }
+}
+
+/* E o documento cresce junto com a tela em vez de virar uma coluna
+   estreita no meio de um deserto. A medida continua em 68 caracteres —
+   o que aumenta é o tamanho do caractere, que é como papel grande
+   funciona. */
+@media (min-width: 86rem) {
+  html { font-size: 109%; }
+  :root { --sumario: 16rem; --vao: 3.5rem; --margem: 1.5rem; }
+}
+
+@media (min-width: 106rem) {
+  html { font-size: 118%; }
+  :root { --sumario: 18rem; --vao: 4rem; }
+}
+
+@media (min-width: 140rem) {
+  html { font-size: 128%; }
+  :root { --sumario: 19rem; }
+}
+
+/* ── Base ──────────────────────────────────────────────────────── */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--fundo);
+  color: var(--tinta);
+  font: 1.0625rem/1.7 var(--fonte-corpo);
+  font-variant-numeric: oldstyle-nums proportional-nums;
+  transition: background-color .2s linear, color .2s linear;
+}
+
+/* Grão de papel: turbulência local, nenhuma requisição. Some quase por
+   inteiro nas fases da lua e da hora neutra. */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: var(--grao);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23g)'/%3E%3C/svg%3E");
+}
+
+a {
+  color: var(--brasa);
+  text-decoration-thickness: 1px;
+  text-underline-offset: .18em;
+}
+a:hover {
+  text-decoration-thickness: 2px;
+  text-decoration-color: var(--brasa-fraca);
+}
+
+:focus-visible {
+  outline: 2px solid var(--brasa);
+  outline-offset: 2px;
+}
+
+.pular {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  z-index: 5;
+  padding: .6rem 1rem;
+  background: var(--fundo-2);
+  color: var(--tinta);
+  font: .8rem var(--fonte-oficial);
+  border: 1px solid var(--regua);
+}
+.pular:focus { left: .5rem; top: .5rem; }
+
+/* ── Barra de rolagem ──────────────────────────────────────────── */
+
+/* Sem isto o navegador pinta uma calha cinza de sistema no meio do
+   papel, e ela é a única coisa da página que não obedece à fase.
+   Vale para a folha e para todo contêiner que rola por dentro — as
+   tabelas do livro-razão e a fita do sumário.
+
+   Dois blocos porque são dois padrões: `scrollbar-*` é o do CSS, que
+   Firefox implementa; `::-webkit-scrollbar` é o de fato, que Blink e
+   WebKit implementam. Nenhum dos dois entende o outro, e os dois
+   precisam dizer a mesma coisa. */
+
+html {
+  scrollbar-width: thin;
+  scrollbar-color: var(--tinta-fraca) transparent;
+}
+
+::-webkit-scrollbar {
+  width: 11px;
+  height: 11px;
+}
+
+::-webkit-scrollbar-track,
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/* A borda transparente com `background-clip` afina o polegar sem
+   afinar a área de clique, e o deixa flutuando sobre qualquer fundo
+   — o que importa porque dentro de uma tabela o fundo é `--fundo-2`
+   e na folha é `--fundo`. Pintar a calha quebraria num dos dois. */
+::-webkit-scrollbar-thumb {
+  background-color: var(--tinta-fraca);
+  background-clip: content-box;
+  border: 3px solid transparent;
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: var(--brasa);
+}
+
+/* ── Timbre ────────────────────────────────────────────────────── */
+
+.timbre {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas:
+    "marca"
+    "carimbo"
+    "controles";
+  gap: 1.1rem;
+  max-width: var(--pagina);
+  margin: 0 auto;
+  padding: 1.5rem var(--margem) 1.1rem;
+  border-bottom: 3px double var(--regua);
+}
+
+@media (min-width: 48rem) {
+  .timbre {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      "marca     carimbo"
+      "controles carimbo";
+    gap: 1rem 1.5rem;
+    align-items: center;
+    padding-top: 1.75rem;
+  }
+}
+
+.timbre-marca {
+  grid-area: marca;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.selo {
+  flex: 0 0 auto;
+  width: 3.6rem;
+  height: 3.6rem;
+  color: var(--brasa);
+}
+
+.timbre-linhas p { margin: 0; }
+
+.timbre-guilda {
+  font-family: var(--fonte-oficial);
+  font-size: .72rem;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--tinta-fraca);
+}
+
+.timbre-linhas .timbre-titulo {
+  margin: .15rem 0 .25rem;
+  font-family: var(--fonte-titulo);
+  font-size: 1.5rem;
+  line-height: 1.25;
+}
+.timbre-titulo a {
+  color: var(--tinta);
+  text-decoration: none;
+}
+.timbre-titulo a:hover { text-decoration: underline; }
+
+.timbre-meta {
+  font-family: var(--fonte-oficial);
+  font-size: .72rem;
+  letter-spacing: .06em;
+  color: var(--tinta-fraca);
+}
+
+/* O carimbo. Borda dupla que não fecha nos cantos, tinta gasta por
+   máscara, e a inclinação de quem bateu com a mão. */
+.carimbo {
+  grid-area: carimbo;
+  justify-self: end;
+  display: inline-grid;
+  justify-items: center;
+  gap: .1em;
+  margin: 0;
+  padding: .55rem 1.15rem .5rem;
+  border: 2px solid var(--carimbo);
+  color: var(--carimbo);
+  font-family: var(--fonte-oficial);
+  text-transform: uppercase;
+  transform: rotate(-4deg);
+  position: relative;
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='100'%3E%3Cfilter id='d'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 -0.1 1'/%3E%3C/filter%3E%3Crect width='220' height='100' filter='url(%23d)'/%3E%3C/svg%3E");
+          mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='100'%3E%3Cfilter id='d'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 -0.1 1'/%3E%3C/filter%3E%3Crect width='220' height='100' filter='url(%23d)'/%3E%3C/svg%3E");
+  -webkit-mask-size: cover;
+          mask-size: cover;
+  -webkit-mask-repeat: no-repeat;
+          mask-repeat: no-repeat;
+}
+.carimbo::before {
+  content: "";
+  position: absolute;
+  inset: 3px;
+  border: 1px solid var(--carimbo);
+  transform: rotate(.55deg);   /* os cantos não fecham, e é de propósito */
+  opacity: .85;
+}
+.carimbo-verbo {
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: .2em;
+  text-indent: .2em;           /* compensa o espaço final do letter-spacing */
+  line-height: 1.15;
+}
+.carimbo-orgao {
+  font-size: .62rem;
+  letter-spacing: .14em;
+  text-indent: .14em;
+}
+
+/* ── Controles: fase e hora neutra ─────────────────────────────── */
+
+/* Sem script não há fase para escolher: a linha de controles inteira
+   não existe, e o documento fica na fase do sol. */
+.controles { display: none; }
+.js .controles {
+  grid-area: controles;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: .75rem 1rem;
+}
+
+.seletor {
+  display: flex;
+  border: 1px solid var(--regua);
+}
+
+.seletor button {
+  margin: 0;
+  padding: .3rem .7rem;
+  border: 0;
+  border-right: 1px solid var(--regua);
+  background: transparent;
+  color: var(--tinta-fraca);
+  font: .72rem/1.4 var(--fonte-oficial);
+  letter-spacing: .08em;
+  cursor: pointer;
+}
+.seletor button:last-child { border-right: 0; }
+.seletor button:hover { color: var(--tinta); }
+.seletor button[aria-pressed="true"] {
+  background: var(--fundo-2);
+  color: var(--tinta);
+  box-shadow: inset 0 -2px 0 var(--brasa);
+}
+
+.hora-neutra { display: none; }
+[data-fase="fio"] .hora-neutra {
+  display: block;
+  margin: 0;
+  font: .72rem var(--fonte-oficial);
+  letter-spacing: .18em;
+  text-transform: lowercase;
+  color: var(--tinta-fraca);
+}
+
+/* ── A folha ───────────────────────────────────────────────────── */
+
+.folha {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 2rem;
+  max-width: var(--pagina);
+  margin: 0 auto;
+  padding: 0 var(--margem);
+}
+
+@media (min-width: 62rem) {
+  .folha {
+    grid-template-columns: var(--sumario) minmax(0, 1fr);
+    gap: var(--vao);
+    padding-top: 2.5rem;
+  }
+}
+
+/* ── Sumário ───────────────────────────────────────────────────── */
+
+.sumario-rotulo {
+  margin: 0 0 .5rem;
+  font: .68rem var(--fonte-oficial);
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--tinta-fraca);
+}
+
+.sumario ol {
+  display: flex;
+  gap: .35rem;
+  margin: 0;
+  padding: 0 0 .5rem;
+  list-style: none;
+  overflow-x: auto;
+  scroll-snap-type: x proximity;
+  overscroll-behavior-x: contain;
+}
+.sumario li { flex: 0 0 auto; scroll-snap-align: start; }
+
+.sumario a {
+  display: flex;
+  align-items: baseline;
+  gap: .5rem;
+  padding: .35rem .6rem;
+  border: 1px solid var(--regua);
+  color: var(--tinta);
+  text-decoration: none;
+  white-space: nowrap;
+}
+.sumario a:hover { background: var(--fundo-2); }
+.sumario a[aria-current="page"] {
+  background: var(--fundo-2);
+  box-shadow: inset 2px 0 0 var(--brasa);
+}
+
+.sumario-numero {
+  font: .68rem var(--fonte-oficial);
+  font-variant-numeric: tabular-nums;
+  color: var(--tinta-fraca);
+}
+.sumario-titulo { font-size: .92rem; }
+
+@media (min-width: 62rem) {
+  .sumario {
+    position: sticky;
+    top: 0;
+    align-self: start;
+    max-height: 100vh;
+    overflow-y: auto;
+    padding: 1.5rem 0;
+    margin-top: -2.5rem;
+  }
+  .sumario ol {
+    display: block;
+    overflow: visible;
+    padding: 0;
+  }
+  .sumario li + li { margin-top: .1rem; }
+  .sumario a {
+    border: 0;
+    border-left: 2px solid transparent;
+    padding: .25rem .6rem;
+    white-space: normal;
+  }
+  .sumario a[aria-current="page"] {
+    border-left-color: var(--brasa);
+    box-shadow: none;
+  }
+  .sumario-numero { min-width: 1.6em; }
+}
+
+/* ── O documento ───────────────────────────────────────────────── */
+
+.documento {
+  max-width: var(--medida);
+  /* Sem sumário ao lado — tablet — o texto se centra em vez de ficar
+     encostado à esquerda com um vão à direita. Com sumário a coluna já
+     tem a medida exata, e a margem automática dá zero. */
+  margin-inline: auto;
+  padding: 2rem 0 1rem;
+}
+@media (min-width: 62rem) {
+  .documento { padding-top: 0; }
+}
+
+.documento > :first-child { margin-top: 0; }
+
+.documento h1 {
+  margin: 0 0 2rem;
+  font: 600 2rem/1.2 var(--fonte-titulo);
+  letter-spacing: -.01em;
+}
+
+.documento h2 {
+  position: relative;
+  margin: 3.2rem 0 1rem;
+  padding-top: 2rem;
+  font: 600 1.35rem/1.3 var(--fonte-titulo);
+}
+/* Régua de seção: filete com o glifo da fase no meio. */
+.documento h2::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  border-top: 1px solid var(--regua);
+}
+.documento h2::after {
+  content: var(--glifo);
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  padding: 0 .7em;
+  background: var(--fundo);
+  color: var(--tinta-fraca);
+  font-size: .62rem;
+  line-height: 1;
+  opacity: .6;
+}
+
+.documento h3 {
+  margin: 2rem 0 .6rem;
+  font: 600 1.05rem/1.35 var(--fonte-titulo);
+  letter-spacing: .02em;
+}
+
+.documento p { margin: 0 0 1.15rem; }
+
+.documento ul,
+.documento ol { margin: 0 0 1.15rem; padding-left: 1.4rem; }
+.documento li { margin-bottom: .4rem; }
+.documento li::marker { color: var(--tinta-fraca); }
+
+.documento hr {
+  height: 0;
+  margin: 2.2rem 0;
+  border: 0;
+  border-top: 1px solid var(--regua);
+}
+
+.documento strong { font-weight: 700; }
+
+/* Nota carimbada na margem. A cartilha ainda não usa citação em bloco;
+   quando usar, ela chega como aviso pregado ao lado do texto. */
+.documento blockquote {
+  margin: 1.6rem 0;
+  padding: .9rem 1.1rem;
+  border: 1px solid var(--regua);
+  border-left: 3px solid var(--carimbo);
+  background: var(--fundo-2);
+  color: var(--tinta);
+}
+.documento blockquote > :last-child { margin-bottom: 0; }
+
+.documento code {
+  font: .9em var(--fonte-oficial);
+  background: var(--fundo-2);
+  padding: .1em .3em;
+}
+
+/* ── Tabelas: livro-razão ──────────────────────────────────────── */
+
+.documento table {
+  display: block;          /* vira o próprio contêiner de rolagem     */
+  overflow-x: auto;
+  max-width: 100%;
+  margin: 0 0 1.6rem;
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums;
+  font-size: .95rem;
+}
+
+/* Largura mínima de célula: 9rem. A 6rem uma frase como "Guardou
+   resíduo de gema" quebrava numa palavra por linha em janela estreita
+   de notebook, e a tabela ficava ilegível justamente onde ela é o
+   conteúdo — as tabelas de camada e de terreno. O custo é mais rolagem
+   horizontal, que a tabela já resolve sozinha por ser o próprio
+   contêiner de rolagem. */
+.documento th,
+.documento td {
+  min-width: 9rem;
+  padding: .55rem .8rem;
+  text-align: left;
+  vertical-align: top;
+  border-bottom: 1px solid var(--regua);
+}
+
+.documento thead th {
+  background: var(--fundo-2);
+  border-top: 1px solid var(--regua);
+  border-bottom: 1px solid var(--regua);
+  font: .7rem/1.5 var(--fonte-oficial);
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--tinta-fraca);
+  white-space: nowrap;
+}
+
+.documento tbody tr:nth-child(even) { background: var(--faixa); }
+.documento tbody tr:last-child td { border-bottom: 1px solid var(--regua); }
+.documento td:first-child { min-width: 5rem; }
+
+/* ── Paginação ─────────────────────────────────────────────────── */
+
+.paginacao {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: space-between;
+  margin-top: 3.5rem;
+  padding-top: 1.2rem;
+  border-top: 1px solid var(--regua);
+}
+
+.paginacao a {
+  display: grid;
+  gap: .15rem;
+  max-width: 48%;
+  color: var(--tinta);
+  text-decoration: none;
+}
+.paginacao-seguinte { text-align: right; margin-left: auto; }
+
+.paginacao-rotulo {
+  font: .68rem var(--fonte-oficial);
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--tinta-fraca);
+}
+.paginacao-titulo {
+  font-size: 1rem;
+  color: var(--brasa);
+}
+.paginacao a:hover .paginacao-titulo { text-decoration: underline; }
+
+/* ── Rodapé ───────────────────────────────────────────────────── */
+
+.rodape {
+  position: relative;
+  z-index: 2;
+  max-width: var(--pagina);
+  margin: 4rem auto 0;
+  padding: 1.5rem var(--margem) 3rem;
+}
+.rodape::before {
+  content: "";
+  display: block;
+  margin-bottom: 1.5rem;
+  border-top: 1px solid var(--regua);
+}
+
+.advertencia {
+  max-width: 48ch;
+  margin: 0 auto;
+  text-align: center;
+  font-size: .95rem;
+  color: var(--tinta-fraca);
+}
+
+.endereco { display: none; }
+
+/* ── Impressão: a cartilha volta a ser papel ──────────────────── */
+
+@media print {
+  :root,
+  [data-fase="sol"],
+  [data-fase="lua"],
+  [data-fase="fio"] {
+    --fundo:       #fff;
+    --fundo-2:     #fff;
+    --faixa:       #f2f2f2;
+    --tinta:       #000;
+    --tinta-fraca: #333;
+    --regua:       #999;
+    --brasa:       #000;
+    --brasa-fraca: #666;
+    --carimbo:     #444;
+    --glifo: "●";
+    --grao: 0;
+  }
+
+  body { font-size: 11pt; }
+  body::before { display: none; }
+
+  .pular,
+  .sumario,
+  .seletor,
+  .hora-neutra,
+  .paginacao { display: none !important; }
+
+  .timbre,
+  .folha,
+  .rodape { max-width: none; padding-left: 0; padding-right: 0; }
+
+  /* Medida um pouco mais larga que na tela: a folha A4 comporta, e
+     poupa papel sem virar linha de cem caracteres. */
+  .documento { max-width: 72ch; padding-top: .5rem; }
+
+  a { color: inherit; text-decoration: none; }
+
+  .documento h1,
+  .documento h2,
+  .documento h3 { break-after: avoid; }
+  .documento table,
+  .documento tr,
+  .documento blockquote { break-inside: avoid; }
+  .documento p { orphans: 3; widows: 3; }
+
+  .endereco {
+    display: block;
+    margin: 1rem 0 0;
+    text-align: center;
+    font: .7rem var(--fonte-oficial);
+    letter-spacing: .1em;
+    color: var(--tinta-fraca);
+  }
+}
+
+/* ── Movimento ────────────────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    transition: none !important;
+    animation: none !important;
+    scroll-behavior: auto !important;
+  }
+}
